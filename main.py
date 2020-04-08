@@ -199,7 +199,7 @@ if reformat:
                         dataRow = dataRow + data[x][y].replace("\n", "")
 
                 try:
-                    var = int(data[x][6])
+                    var = int(data[x][6])-1
                 except:
                     var = 0
 
@@ -208,10 +208,15 @@ if reformat:
 
                     for z in range(0,maxContams+1):
                         try:
-                            if z != maxContams:
+                            if z != maxContams and z <= var:
                                 dataRow = dataRow + data[x][8][z] + ","
-                            else:
+                            elif z <= var:
                                 dataRow = dataRow + data[x][8][z]
+                            else:
+                                if z != maxContams:
+                                    dataRow = dataRow + "N/A,"
+                                else:
+                                    dataRow = dataRow + "N/A"
                         except:
                             if z != maxContams:
                                 dataRow = dataRow + "N/A,"
@@ -220,12 +225,17 @@ if reformat:
                     
                     dataRow = dataRow + ","
 
-                    for z in range(maxContams+1,maxOthers+1):
+                    for z in range(var+1,maxOthers+1):
                         try:
-                            if z != len(data[x][8])-1:
+                            if z != len(data[x][8])-1 and z <= len(data[x][8])-1:
                                 dataRow = dataRow + data[x][8][z] + ","
-                            else:
+                            elif  z <= len(data[x][8])-1:
                                 dataRow = dataRow + data[x][8][z]
+                            else:
+                                if z != maxOthers:
+                                    dataRow = dataRow + "N/A,"
+                                else:
+                                    dataRow = dataRow + "N/A"
                         except:
                             if z != maxOthers:
                                 dataRow = dataRow + "N/A,"

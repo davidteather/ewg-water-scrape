@@ -1,7 +1,7 @@
 from selenium import webdriver
 import time
 
-scrapeData = False
+scrapeData = True
 reformat = True
 
 if scrapeData:
@@ -158,10 +158,10 @@ if reformat:
             if len(data[x][8]) > maxContams:
                 maxContams = len(data[x][8])
 
-        headerString = "Utility name,Testing Description,City,State,People Served,Utility Name URL,Exceed Contaminant Count,Total Contaminants,Data Available,Source"
-        lenHeaders = len(headerString.split(","))
-        for x in range(0,maxContams):
-            headerString = headerString + ",contaminant" + str(x)
+        headerString = "Utility name,Testing Description,City,State,People Served,Utility Name URL,Exceed Contaminant Count,Total Contaminants,Data Available,Source,Exceed,Other"
+        #lenHeaders = len(headerString.split(","))
+        #for x in range(0,maxContams):
+        #    headerString = headerString + ",contaminant" + str(x)
 
         # Created Header Need to reformat
         with open("output.csv", 'w+') as obj:
@@ -179,10 +179,28 @@ if reformat:
                     elif y == len(data[x])-1:
                         dataRow = dataRow + data[x][y].replace("\n", "")
 
-                for z in range(0,len(data[x][8])):
-                    if z != len(data[x][8])-1:
-                        dataRow = dataRow + data[x][8][z] + ","
-                    else:
-                        dataRow = dataRow + data[x][8][z]
+                try:
+                    var = int(data[x][6])
+                except:
+                    var = 0
+
+                if data[x][8][0] != "N/A":
+
+                    for z in range(0,var):
+                        if z != var-1:
+                            dataRow = dataRow + data[x][8][z] + ";"
+                        else:
+                            dataRow = dataRow + data[x][8][z]
+                    
+                    dataRow = dataRow + ","
+
+                    for z in range(var+1,len(data[x][8])):
+                        if z != len(data[x][8])-1:
+                            dataRow = dataRow + data[x][8][z] + ";"
+                        else:
+                            dataRow = dataRow + data[x][8][z]
+
+                else:
+                    dataRow = dataRow + "N/A,N/A"
 
                 output.write(dataRow + "\n")

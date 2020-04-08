@@ -1,7 +1,7 @@
 from selenium import webdriver
 import time
 
-scrapeData = True
+scrapeData = False
 reformat = True
 
 if scrapeData:
@@ -154,14 +154,33 @@ if reformat:
 
         # Has all data extracted need to reformat csv
         maxContams = 0
-        for x in range(0,len(data)):
-            if len(data[x][8]) > maxContams:
-                maxContams = len(data[x][8])
 
-        headerString = "Utility name,Testing Description,City,State,People Served,Utility Name URL,Exceed Contaminant Count,Total Contaminants,Data Available,Source,Exceed,Other"
-        #lenHeaders = len(headerString.split(","))
-        #for x in range(0,maxContams):
-        #    headerString = headerString + ",contaminant" + str(x)
+        
+
+        for x in range(0,len(data)):
+            try:
+                var1 = int(data[x][6])
+            except:
+                var1 = 0
+            if var1 > maxContams:
+                maxContams = var1
+
+        maxOthers = 0
+        for x in range(0,len(data)):
+            try:
+                var1 = int(data[x][6])
+            except:
+                var1 = 0
+            if  len(data[x][8]) - var1 > maxOthers:
+                maxOthers = len(data[x][8]) - var1
+
+        headerString = "Utility name,Testing Description,City,State,People Served,Utility Name URL,Exceed Contaminant Count,Total Contaminants,Data Available,Source"
+        lenHeaders = len(headerString.split(","))
+        for x in range(0,maxContams):
+            headerString = headerString + ",exceed" + str(x)
+
+        for x in range(0,maxOthers):
+            headerString = headerString + ",other" + str(x)
 
         # Created Header Need to reformat
         with open("output.csv", 'w+') as obj:
@@ -184,23 +203,40 @@ if reformat:
                 except:
                     var = 0
 
-                if data[x][8][0] != "N/A":
 
-                    for z in range(0,var):
-                        if z != var-1:
-                            dataRow = dataRow + data[x][8][z] + ";"
-                        else:
-                            dataRow = dataRow + data[x][8][z]
+                if data[x][8][0] != "N/A" or data[x][8][0] != "":
+
+                    for z in range(0,maxContams+1):
+                        try:
+                            if z != maxContams:
+                                dataRow = dataRow + data[x][8][z] + ","
+                            else:
+                                dataRow = dataRow + data[x][8][z]
+                        except:
+                            if z != maxContams:
+                                dataRow = dataRow + "N/A,"
+                            else:
+                                dataRow = dataRow + "N/A"
                     
                     dataRow = dataRow + ","
 
-                    for z in range(var+1,len(data[x][8])):
-                        if z != len(data[x][8])-1:
-                            dataRow = dataRow + data[x][8][z] + ";"
-                        else:
-                            dataRow = dataRow + data[x][8][z]
+                    for z in range(maxContams+1,maxOthers+1):
+                        try:
+                            if z != len(data[x][8])-1:
+                                dataRow = dataRow + data[x][8][z] + ","
+                            else:
+                                dataRow = dataRow + data[x][8][z]
+                        except:
+                            if z != maxOthers:
+                                dataRow = dataRow + "N/A,"
+                            else:
+                                dataRow = dataRow + "N/A"
 
                 else:
-                    dataRow = dataRow + "N/A,N/A"
+                    for z in range(0,maxContams+maxOthers+1):
+                        if z != maxContams+maxOthers:
+                            dataRow = dataRow + "N/A,"
+                        else:
+                            dataRow = dataRow + "N/A"
 
                 output.write(dataRow + "\n")
